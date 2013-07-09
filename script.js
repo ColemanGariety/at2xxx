@@ -87,7 +87,7 @@ var images = [],
 var append = function() {
   var photo = images[0]
   
-  if (window.location.hash == "#nsfw") {
+  if (window.location.hash != "") {
       var str = "<img src=\"http://i.imgur.com/" + photo.hash + "h" + photo.ext + "\" onload=\"nextImage()\" class=\"hidden\">"
   } else {
       var str = "<img src=\"http://farm" + photo.farm + ".staticflickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + "_b.jpg\" onload=\"nextImage()\" class=\"hidden\">"
@@ -103,8 +103,8 @@ var getPhotos = function() {
       page++;
       
       // Custom shit
-      if (window.location.hash == "#nsfw") {
-        url = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + "http://imgur.com/r/highresnsfw/page/" + page + ".json?format=jsonp&callback=?" + '"') + '&format=json&callback=?';
+      if (window.location.hash != "") {
+        url = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + "http://imgur.com/r/" + window.location.hash.substr(1) + "/page/" + page + ".json?format=jsonp&callback=?" + '"') + '&format=json&callback=?';
         
       } else {
         url = "http://api.flickr.com/services/rest/?format=json&method=flickr.interestingness.getList&api_key=fcbb0d352e5715c62d9b76293a69f2cc&date=" + someDate + "&per_page=25&page=" + page + "&format=json&jsoncallback=?"
@@ -113,25 +113,25 @@ var getPhotos = function() {
       $($("section img")[$("section img").length - 1]).addClass("ready");
 
     $.getJSON(url, function(data){
-      console.log(data)
-      
       // Moar custom shit
-      if (window.location.hash == "#nsfw") {
-        var photo = JSON.parse(data.query.results.body.p).data
-        console.log(photo)
+      if (window.location.hash != "") {
+        var photo = JSON.parse(data.query.results.body.p).data,
+            width = photo.width
       } else {
         var photo = data.photos.photo
       }
       
-      $(photo).each(function(){
-        images.push(this);
-      });
-
-      append(photo[0]);
-      
-      $('section').masonry({
-        columnWidth: 480
-      });
+      if (window.location.hash == "" || width >= 960) {
+        $(photo).each(function(){
+          images.push(this);
+        });
+  
+        append(photo[0]);
+        
+        $('section').masonry({
+          columnWidth: 480
+        });
+      }
     });
   }
 }
