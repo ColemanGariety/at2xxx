@@ -116,7 +116,7 @@ var getPhotos = function() {
       // Moar custom shit
       if (window.location.hash != "") {
         var photo = JSON.parse(data.query.results.body.p).data,
-            width = photo.width
+            width = photo[0].width
       } else {
         var photo = data.photos.photo
       }
