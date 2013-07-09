@@ -7,6 +7,10 @@ var randomDate = function(start, end) {
 	return year + '-' + modMonth.slice(-2) + "-" + date.slice(-2);
 };
 
+if (window.location.hash) {
+  $("#reddit").html(window.location.hash.substr(1))
+}
+
 (function() {
 	var fullScreenApi = { 
 			supportsFullScreen: false,
