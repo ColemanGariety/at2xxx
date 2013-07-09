@@ -115,23 +115,23 @@ var getPhotos = function() {
     $.getJSON(url, function(data){
       // Moar custom shit
       if (window.location.hash != "") {
-        var photo = JSON.parse(data.query.results.body.p).data,
-            width = photo[0].width
+        var photo = JSON.parse(data.query.results.body.p).data
       } else {
         var photo = data.photos.photo
       }
       
-      if (window.location.hash == "" || width >= 960) {
-        $(photo).each(function(){
+      $(photo).each(function(){
+        console.log(this.width)
+        if (window.location.hash == "" || this.width >= 960) {
           images.push(this);
-        });
-  
-        append(photo[0]);
-        
-        $('section').masonry({
-          columnWidth: 480
-        });
-      }
+        }
+      });
+
+      append(photo[0]);
+      
+      $('section').masonry({
+        columnWidth: 480
+      });
     });
   }
 }
