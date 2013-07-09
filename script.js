@@ -14,29 +14,51 @@ var images = [],
 
 var append = function() {
   var photo = images[0]
+  
+  if (window.location.hash == "#nsfw") {
+      var str = "<img src=\"http://i.imgur.com/" + photo.hash + photo.ext + "\" onload=\"nextImage()\" class=\"hidden\">"
+  } else {
+      var str = "<img src=\"http://farm" + photo.farm + ".staticflickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + "_b.jpg\" onload=\"nextImage()\" class=\"hidden\">"
+  }
 
-  $("section").append("<img src=\"http://farm" + photo.farm + ".staticflickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + "_b.jpg\" onload=\"nextImage()\" class=\"hidden\">")
+  $("section").append(str)
   images.shift()
 }
 
 var getPhotos = function() {
   if (readyForMore == true) {
+      readyForMore = false;
       page++;
+      
+      // Custom shit
+      if (window.location.hash == "#nsfw") {
+        url = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from html where url="' + "http://imgur.com/r/highresnsfw/page/" + page + ".json?format=jsonp&callback=?" + '"') + '&format=json&callback=?';
+        
+      } else {
+        url = "http://api.flickr.com/services/rest/?format=json&method=flickr.interestingness.getList&api_key=fcbb0d352e5715c62d9b76293a69f2cc&date=" + someDate + "&per_page=25&page=" + page + "&format=json&jsoncallback=?"
+      }
 
       $($("section img")[$("section img").length - 1]).addClass("ready");
 
-    $.getJSON("http://api.flickr.com/services/rest/?format=json&method=flickr.interestingness.getList&api_key=fcbb0d352e5715c62d9b76293a69f2cc&date=" + someDate + "&per_page=25&page=" + page + "&format=json&jsoncallback=?", function(data){
+    $.getJSON(url, function(data){
       console.log(data)
-
-      readyForMore = false;
-
-      $(data.photos.photo).each(function(){
+      
+      // Moar custom shit
+      if (window.location.hash == "#nsfw") {
+        var photo = JSON.parse(data.query.results.body.p).data
+        console.log(photo)
+      } else {
+        var photo = data.photos.photo
+      }
+      
+      $(photo).each(function(){
         images.push(this);
       });
 
-      append(data.photos.photo[0])
+      append(photo[0]);
+      
       $('section').masonry({
-        columnWidth: 400
+        columnWidth: 480
       });
     });
   }
@@ -59,7 +81,7 @@ var nextImage = function() {
 getPhotos();
 
 $("html, body").add(window).scroll(function(){
-  if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+  if ($(window).scrollTop() + $(window).height() > $(document).height() - 500) {
     getPhotos();
   }
 });

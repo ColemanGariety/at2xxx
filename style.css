@@ -41,7 +41,7 @@ header {
 
 section {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
@@ -50,7 +50,7 @@ section img:first-child {
 }
 
 section img {
-  max-width: 400px;
+  max-width: 480px;
   vertical-align: top;
   opacity: 0;
   -webkit-transform: translateZ(0);
